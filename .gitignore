@@ -1,0 +1,10 @@
+# IDEA
+.idea
+out
+*.iml
+
+# eclipse
+.metadata
+.settings/
+.project
+.classpath
