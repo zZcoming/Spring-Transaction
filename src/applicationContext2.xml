@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd">
+
+	<!--加入properties配置文件-->
+	<context:property-placeholder location="jdbc.properties"/>
+
+	<!--c3p0数据源-->
+	<bean id="dataSource" class="org.springframework.jdbc.datasource.DriverManagerDataSource">
+		<property name="driverClassName" value="${jdbc.driverClassName}"/>
+		<property name="url" value="${jdbc.url}"/>
+		<property name="username" value="${jdbc.username}"/>
+		<property name="password" value="${jdbc.password}"/>
+	</bean>
+
+	<!--配置Dao-->
+	<!-- 直接以dataSource为参数时，set方法有所不同 -->
+	<bean id="accountDao" class="com.imooc.spring.transaction.demo2.AccountDaoImpl">
+		<property name="dataSource" ref="dataSource"/>
+	</bean>
+
+	<!--配置Service-->
+	<bean id="accountService" class="com.imooc.spring.transaction.demo2.AccountServiceImpl">
+		<property name="accountDao" ref="accountDao"/>
+	</bean>
+
+	<!--事务管理器-->
+	<bean id="transactionManager" class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
+		<property name="dataSource" ref="dataSource"/>
+	</bean>
+
+	<!--配置业务层代理-->
+	<bean id="transactionProxyFactoryBean" class="org.springframework.transaction.interceptor.TransactionProxyFactoryBean">
+		<!--注入代理对象-->
+		<property name="target" ref="accountService"/>
+		<!--注入事务管理器-->
+		<property name="transactionManager" ref="transactionManager"/>
+		<!--配置事务属性-->
+		<property name="transactionAttributes">
+			<props>
+				<!--
+					prop的格式：
+						* propagation  : 事务的传播级别
+						* isolation    : 事务的隔离级别
+						* readOnly     : 只读？
+						* -Exception   : 发生哪些异常回滚
+						* +Exception   : 发生哪些异常不回滚
+				-->
+				<!--要进行事务管理的方法-->
+				<prop key="transfer">PROPAGATION_REQUIRED</prop>
+				<!--其余方法只能读取数据-->
+				<prop key="*">PROPAGATION_REQUIRED,readOnly</prop>
+			</props>
+		</property>
+	</bean>
+
+</beans>

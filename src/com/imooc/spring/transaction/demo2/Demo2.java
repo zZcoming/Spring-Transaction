@@ -1,19 +1,17 @@
-package com.imooc.spring.transaction.demo1;
+package com.imooc.spring.transaction.demo2;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
-/**
- * Created by zZ on 2016/5/22.
- */
-@RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration(locations = "classpath:applicationContext.xml")
-public class Demo1 {
+import javax.annotation.Resource;
 
-	@Autowired
+@RunWith(SpringJUnit4ClassRunner.class)
+@ContextConfiguration(locations = "classpath:applicationContext2.xml")
+public class Demo2 {
+
+	@Resource(name = "transactionProxyFactoryBean")
 	private AccountService accountService;
 
 	public void setAccountService(AccountService accountService) {
@@ -24,10 +22,9 @@ public class Demo1 {
 	 * 在测试本方法前，请先修改jdbc.properties配置文件中的数据库，并按给定的sql语句建表
 	 *
 	 * 思路：
-	 *     1. DAO层通过JdbcTemplate来操作数据库，简化代码
-	 *     2. 使用org.springframework.transaction.support.TransactionTemplate管理事务
-	 *           并向TransactionTemplate中注入事务管理器
-	 *     3. 在Service层中直接调用TransactionTemplate的execute方法来执行业务
+	 *     1. 采用AOP的方式，通过配置org.springframework.transaction.interceptor.TransactionProxyFactoryBean来管理事务和生成代理
+	 *           注入需要代理的业务、事务管理器、事务的属性
+	 *     2. 使用生成的代理来执行业务
 	 */
 	@Test
 	public void testTransfer() {
