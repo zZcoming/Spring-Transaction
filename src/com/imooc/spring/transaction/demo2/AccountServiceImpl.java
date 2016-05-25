@@ -7,7 +7,7 @@ public class AccountServiceImpl implements AccountService {
 	@Override
 	public void transfer(String out, String in, Double money) {
 		accountDao.outMoney(out, money);
-		int i = 10 / 0;
+//		int i = 10 / 0;
 		accountDao.inMoney(in, money);
 	}
 

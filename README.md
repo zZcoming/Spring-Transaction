@@ -10,7 +10,7 @@
  1. A账户扣钱
  2. B账户加钱
 
-既然是 事务管理 ，那么测试的方法就是在第1步（inMoney(A, 100)）之后发生异常。
+既然是 事务管理 ，那么测试的方法就是在第1步（outMoney(A, 100)）之后发生异常。
 如果A账户的钱减少了，就说明事务管理没有生效（因为没有回滚（rollback）），反之则有效。
 
 ### demo1中的示例：使用事务管理模板（TransactionTemplate）来执行事务
@@ -35,6 +35,13 @@
     2. 配置事务管理器
 	3. 既然是使用AspectJ，那么就要配置通知（Advice）
 	4. 在<aop:config>中定义切点（Pointcut），并和Advice整合
+
+### demo4中的示例：使用AspectJ，基于注解的方式配置
+ 1. Demo4为测试用例
+ 2. 使用AspectJ，基于注解的方式配置
+    1. 配置基本同demo3
+    2. 不需要配置<aop:config>，转为使用<tx:annotation-driven>，并在其中配置transactionManager
+    3. 在需要进行事务管理的class上写上注解@Transaction，spring就会使用transactionManager来进行事务管理了
 
 ### 说明
 * 所有的jar包都在lib文件夹下
