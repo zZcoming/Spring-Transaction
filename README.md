@@ -43,6 +43,12 @@
     2. 不需要配置<aop:config>，转为使用<tx:annotation-driven>，并在其中配置transactionManager
     3. 在需要进行事务管理的class上写上注解@Transaction，spring就会使用transactionManager来进行事务管理了
 
+### myexample中的示例：我习惯的配置方法
+ 1. Demo5为测试用例
+ 2. 将大部分配置转为注解配置
+ 3. 配置transactionManager、transactionAdvice（txAdvice），最后在<aop:config>中配置使用transactionManager的Pointcut
+ 4. 增加了查询的方法
+
 ### 说明
 * 所有的jar包都在lib文件夹下
 * 所有文件编码格式统一为UTF-8

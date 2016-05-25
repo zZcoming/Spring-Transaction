@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:context="http://www.springframework.org/schema/context" xmlns:tx="http://www.springframework.org/schema/tx"
+       xmlns:aop="http://www.springframework.org/schema/aop"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx.xsd http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop.xsd">
+
+	<!--加入properties配置文件-->
+	<context:property-placeholder location="jdbc.properties"/>
+
+	<!--自动扫描注解，根据注解配置dao、service及其依赖-->
+	<context:component-scan base-package="com.imooc.spring.transaction.myexample"/>
+
+	<!--c3p0数据源-->
+	<bean id="dataSource" class="org.springframework.jdbc.datasource.DriverManagerDataSource">
+		<property name="driverClassName" value="${jdbc.driverClassName}"/>
+		<property name="url" value="${jdbc.url}"/>
+		<property name="username" value="${jdbc.username}"/>
+		<property name="password" value="${jdbc.password}"/>
+	</bean>
+
+	<!--事务管理器-->
+	<bean id="transactionManager" class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
+		<property name="dataSource" ref="dataSource"/>
+	</bean>
+
+	<!--事务的通知-->
+	<tx:advice id="txAdvice" transaction-manager="transactionManager">
+		<tx:attributes>
+			<!-- 方法名  传播级别-->
+			<tx:method name="transfer" propagation="REQUIRED"/>
+			<!--<tx:method name="save*" propagation="REQUIRED"/>-->
+			<!--<tx:method name="update*" propagation="REQUIRED"/>-->
+			<!--<tx:method name="*" propagation="NOT_SUPPORTED" read-only="true"/>-->
+		</tx:attributes>
+	</tx:advice>
+
+	<!--将事务管理应用在切入点（Pointcut）上-->
+	<aop:config>
+		<!--这个切面表示所有service层的方法-->
+		<aop:pointcut id="serviceTransaction"
+		              expression="execution(* com.imooc.spring.transaction.myexample.*Service*.*(..))"/>
+		<aop:advisor advice-ref="txAdvice" pointcut-ref="serviceTransaction"/>
+	</aop:config>
+
+</beans>
