@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:context="http://www.springframework.org/schema/context" xmlns:tx="http://www.springframework.org/schema/tx"
+       xmlns:aop="http://www.springframework.org/schema/aop"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx.xsd http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop.xsd">
+
+	<!--加入properties配置文件-->
+	<context:property-placeholder location="jdbc.properties"/>
+
+	<!--c3p0数据源-->
+	<bean id="dataSource" class="org.springframework.jdbc.datasource.DriverManagerDataSource">
+		<property name="driverClassName" value="${jdbc.driverClassName}"/>
+		<property name="url" value="${jdbc.url}"/>
+		<property name="username" value="${jdbc.username}"/>
+		<property name="password" value="${jdbc.password}"/>
+	</bean>
+
+	<!--配置Dao-->
+	<!-- 直接以dataSource为参数时，set方法有所不同 -->
+	<bean id="accountDao" class="com.imooc.spring.transaction.demo3.AccountDaoImpl">
+		<property name="dataSource" ref="dataSource"/>
+	</bean>
+
+	<!--配置Service-->
+	<bean id="accountService" class="com.imooc.spring.transaction.demo3.AccountServiceImpl">
+		<property name="accountDao" ref="accountDao"/>
+	</bean>
+
+	<!--事务管理器-->
+	<bean id="transactionManager" class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
+		<property name="dataSource" ref="dataSource"/>
+	</bean>
+
+	<!--事务的通知-->
+	<tx:advice id="txAdvice" transaction-manager="transactionManager">
+		<tx:attributes>
+			<!-- 方法名  传播级别-->
+			<tx:method name="transfer" propagation="REQUIRED"/>
+		</tx:attributes>
+	</tx:advice>
+
+	<!--配置切面和通知-->
+	<aop:config>
+		<!--切入点（Pointcut）-->
+		<aop:pointcut id="pointcut1" expression="execution(* com.imooc.spring.transaction.demo3.AccountService+.*(..))"/>
+		<!--切面的通知（Advice）-->
+		<aop:advisor advice-ref="txAdvice" pointcut-ref="pointcut1"/>
+	</aop:config>
+</beans>

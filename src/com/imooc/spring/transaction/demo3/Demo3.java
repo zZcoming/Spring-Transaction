@@ -1,17 +1,16 @@
-package com.imooc.spring.transaction.demo2;
+package com.imooc.spring.transaction.demo3;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
-import javax.annotation.Resource;
-
 @RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration(locations = "classpath:applicationContext2.xml")
-public class Demo2 {
+@ContextConfiguration(locations = "classpath:applicationContext3.xml")
+public class Demo3 {
 
-	@Resource(name = "transactionProxyFactoryBean")
+	@Autowired
 	private AccountService accountService;
 
 	public void setAccountService(AccountService accountService) {
@@ -21,10 +20,13 @@ public class Demo2 {
 	/**
 	 * 在测试本方法前，请先修改jdbc.properties配置文件中的数据库，并按给定的sql语句建表
 	 *
-	 * 思路：
-	 *     1. 采用AOP的方式，通过配置org.springframework.transaction.interceptor.TransactionProxyFactoryBean来管理事务和生成代理
-	 *           注入需要代理的业务、事务管理器、事务的属性
-	 *     2. 使用生成的代理来执行业务
+	 * 思路：使用AspectJ在XML中配置事务
+	 *     1. 配置事务管理器
+	 *     2. 既然是使用AspectJ，那么就要配置通知（Advice）
+	 *     3. 在<aop:config>中定义切点（Pointcut），并和Advice整合
+	 *
+	 * 在这样配置之后，就可以在指定的Pointcut中使用配置的Advice了，
+	 * 这个Advice完成的就是事务管理的功能。
 	 */
 	@Test
 	public void testTransfer() {
